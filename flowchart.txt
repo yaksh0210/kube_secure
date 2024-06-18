@@ -1,0 +1,23 @@
+@startuml 
+title Securing Kubernetes Pods for Production 
+
+actor Administrator as Admin 
+participant "Kubernetes API" as K8sAPI 
+participant RBAC as "Role-Based Access Control" 
+participant "Pod Security Policies" as PodPolicies 
+participant "Network Policies" as NetPolicies 
+participant "Container Registry" as Registry 
+participant "Pod Monitoring" as Monitoring 
+
+Admin -> K8sAPI: Configure RBAC 
+K8sAPI -> RBAC: Setup roles and permissions 
+Admin -> K8sAPI: Define Pod Security Policies 
+K8sAPI -> PodPolicies: Enforce security standards 
+Admin -> K8sAPI: Implement Network Policies 
+K8sAPI -> NetPolicies: Define communication rules 
+Admin -> Registry: Use secure images 
+Registry --> Admin: Provide trusted images 
+Admin -> Monitoring: Set up monitoring 
+Monitoring --> Admin: Monitor pod activity 
+
+@enduml
