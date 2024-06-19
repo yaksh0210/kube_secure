@@ -278,6 +278,7 @@ spec:
     image: busybox
     command: ["sleep", "3600"]
 ```
+``` From test-pod (blocked): ```
 
 + Apply the test pod:
 
