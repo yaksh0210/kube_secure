@@ -6,11 +6,11 @@ spec:
   replicas: 3
   selector:
     matchLabels:
-      app: nginx # This should match the labels initially set when creating the Deployment
+      app: nginx
   template:
     metadata:
       labels:
-        app: nginx # Labels for Pods managed by this Deployment
+        app: nginx
     spec:
       containers:
       - name: nginx

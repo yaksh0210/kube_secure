@@ -65,6 +65,9 @@ rules:
 
 ```kubectl apply -f role.yaml```
 
+<img src="roles.png" alt="role">
+
+
 > Bind Role to Service Account
 
 ```yml
@@ -86,6 +89,8 @@ roleRef:
 - Run Command 
 
 ```kubectl apply -f role-binding.yaml```
+
+<img src="Rolebinding.png" alt="binding">
 
 ### Now its time to limit Pod Privileges (Security Context)
 
@@ -135,6 +140,7 @@ spec:
 
 ``` kubectl apply -f network-policy.yaml ```
 
+<img src="Netpolicy.png" alt="net">
 
 ### Use Secure Images
 
@@ -174,3 +180,125 @@ spec:
 ### Final Statement 
 
 + It Specifies practical experience in securing Kubernetes pods using RBAC, security contexts, network policies, and image security measures
+
+
+## Update in the task
+
++ In network policy make a change where traffic coming from webserver(Nginx) to database (any database i can you here i use mysql) is only allowed all other traffic should get denied
+
+
+### Change in network policy
+
+* networkpolicy.yml
+
+```yml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-nginx-to-backend
+spec:
+  podSelector:
+    matchLabels:
+      app: backend  
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx
+```
+
+<img src="Netpolicy.png" alt="">
+
+* i Have define backend-pod.yml file where i define my database image in which i accept traffic of nginx and deny all other traffic
+
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backend-pod
+  labels:
+    app: backend
+spec:
+  containers:
+  - name: backend
+    image: mysql:5.7
+    env:
+    - name: MYSQL_ROOT_PASSWORD
+      value: mysecretpassword
+```
+
+* After that i have created one nginx-pod which can make communication between nginx and database by allowing traffic from nginx to database
+
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+```
+* once the opertion done we will run the following command to test connectivity
+
++ After deploying the pods and applying the NetworkPolicy:
+
+### Test connectivity to verify if the policy is working as expected.
+
+``` From nginx-pod (allowed): ```
+
+```bash
+kubectl exec -it nginx-pod -- sh
+```
+
++ From within the shell of nginx-pod, try to ping or access the backend-pod:
+
+```bash
+ping backend-pod
+```
++ If the NetworkPolicy is correctly enforced, you should see successful communication with the backend-pod.
+
+
++ Now we create on test-pod.yml which is a blocked one pod which means it is restricted for sending traffic in database(backend-pod) 
+
++ test-pod.yml
+
+```yml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: test-container
+    image: busybox
+    command: ["sleep", "3600"]
+```
+
++ Apply the test pod:
+
+```bash
+kubectl apply -f test-pod.yml
+```
+
++ Execute a shell inside the test-pod:
+
+```bash
+kubectl exec -it test-pod -- sh
+```
+
++ From within the shell of test-pod, try to ping or access the backend-pod:
+
+```bash
+ping backend-pod
+```
+
++ If the NetworkPolicy is correctly enforced, you should see that communication with the backend-pod from test-pod is blocked.
+
+
+<img src='pods.png' alt="image">
+
